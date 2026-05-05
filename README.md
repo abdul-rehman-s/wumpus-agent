@@ -3,7 +3,7 @@
 A web-based Knowledge-Based Agent that navigates a Wumpus World grid using Propositional Logic and Resolution Refutation inference.
 
 ## Live Demo
-[Live URL here — update after Vercel deployment]
+https://wumpus-agent-drab.vercel.app/
 
 ## Project Overview
 This project implements a Dynamic Pathfinding Agent operating in a Wumpus World-style grid. The agent receives percepts (Breeze, Stench, Glitter) as it moves and uses Propositional Logic to deduce safe cells before each move.
