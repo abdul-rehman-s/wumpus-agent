@@ -20,6 +20,7 @@ class Agent:
         self.r, self.c = 1, 1
         self.visited = {(1, 1)}
         self.score = 0
+        self.done = False
 
 # ---------------- KB ----------------
 KB = []
@@ -43,8 +44,6 @@ def resolution(query):
     global inference_steps
     clauses = KB.copy()
     clauses.append([query])
-
-    new = []
 
     while True:
         inference_steps += 1
@@ -125,8 +124,18 @@ def is_safe(r, c):
 
 # ---------------- MOVE ----------------
 def step():
+    # Stop if gold already found
+    if agent.done:
+        return
+
     percepts = get_percepts(agent.r, agent.c)
     update_kb(agent.r, agent.c, percepts)
+
+    # Check if gold found at current cell
+    if (agent.r, agent.c) == world.gold:
+        agent.score += 1000
+        agent.done = True
+        return
 
     moves = [
         (agent.r+1, agent.c),
@@ -161,7 +170,7 @@ def step():
         agent.score -= 1
         return
 
-    # Fallback — revisit any adjacent valid cell to keep moving
+    # Fallback — revisit any adjacent valid cell
     all_moves = [
         (agent.r+1, agent.c),
         (agent.r-1, agent.c),
@@ -190,7 +199,8 @@ def state():
         "gold": world.gold,
         "percepts": get_percepts(agent.r, agent.c),
         "score": agent.score,
-        "inference_steps": inference_steps
+        "inference_steps": inference_steps,
+        "done": agent.done
     })
 
 @app.route("/reset")
