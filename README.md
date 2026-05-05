@@ -59,8 +59,3 @@ Then open http://localhost:5000 in your browser.
 ## Metrics
 - Score: +1000 for finding gold, -1 per move
 - Inference Steps: total Resolution algorithm deductions made
-
-## Course Info
-- Course: Artificial Intelligence
-- University: FAST-NUCES, Chiniot-Faisalabad Campus
-- Semester: 6th — Spring 2026
