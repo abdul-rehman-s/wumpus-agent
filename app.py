@@ -42,7 +42,7 @@ def resolve(ci, cj):
 def resolution(query):
     global inference_steps
     clauses = KB.copy()
-    clauses.append([query])  # already negated when needed
+    clauses.append([query])
 
     new = []
 
@@ -90,7 +90,6 @@ def get_percepts(r, c):
 
 # ---------------- KB UPDATE ----------------
 def update_kb(r, c, percepts):
-
     neighbors = [
         (r+1, c),
         (r-1, c),
@@ -119,10 +118,7 @@ def is_safe(r, c):
     if not (1 <= r <= ROWS and 1 <= c <= COLS):
         return False
 
-    # Prove NO PIT
     no_pit = resolution(f"~P_{r}_{c}")
-
-    # Prove NO WUMPUS
     no_wumpus = resolution(f"~W_{r}_{c}")
 
     return no_pit and no_wumpus
@@ -149,7 +145,7 @@ def step():
             else:
                 unknown_moves.append((r, c))
 
-    # Prefer safe moves
+    # Prefer safe unvisited moves
     if safe_moves:
         r, c = random.choice(safe_moves)
         agent.r, agent.c = r, c
@@ -157,11 +153,25 @@ def step():
         agent.score -= 1
         return
 
-    # Otherwise explore
+    # Explore unknown unvisited
     if unknown_moves:
         r, c = random.choice(unknown_moves)
         agent.r, agent.c = r, c
         agent.visited.add((r, c))
+        agent.score -= 1
+        return
+
+    # Fallback — revisit any adjacent valid cell to keep moving
+    all_moves = [
+        (agent.r+1, agent.c),
+        (agent.r-1, agent.c),
+        (agent.r, agent.c+1),
+        (agent.r, agent.c-1)
+    ]
+    valid_moves = [(r, c) for r, c in all_moves if 1 <= r <= ROWS and 1 <= c <= COLS]
+    if valid_moves:
+        r, c = random.choice(valid_moves)
+        agent.r, agent.c = r, c
         agent.score -= 1
 
 # ---------------- ROUTES ----------------
@@ -172,7 +182,6 @@ def index():
 @app.route("/state")
 def state():
     step()
-
     return jsonify({
         "agent": [agent.r, agent.c],
         "visited": list(agent.visited),
@@ -183,6 +192,14 @@ def state():
         "score": agent.score,
         "inference_steps": inference_steps
     })
+
+@app.route("/reset")
+def reset():
+    global agent, KB, inference_steps
+    agent = Agent()
+    KB = []
+    inference_steps = 0
+    return jsonify({"status": "reset"})
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":
