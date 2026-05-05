@@ -19,4 +19,8 @@ A web-based Knowledge-Based Agent that navigates a Wumpus World grid using Propo
 ```bash
 npm install
 npm run dev
+<<<<<<< HEAD
 ```
+=======
+```
+>>>>>>> 046abc02bb11401cd20d8f6e0fa93188873066f0

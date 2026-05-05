@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wumpus Agent</title>
+    <style>
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 60px);
+            gap: 5px;
+        }
+        .cell {
+            width: 60px;
+            height: 60px;
+            text-align: center;
+            line-height: 60px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Wumpus World Agent</h2>
+
+<div class="grid" id="grid"></div>
+
+<p id="info"></p>
+
+<script>
+function draw(data) {
+    let grid = document.getElementById("grid");
+    grid.innerHTML = "";
+
+    for (let r = 4; r >= 1; r--) {
+        for (let c = 1; c <= 4; c++) {
+            let div = document.createElement("div");
+            div.className = "cell";
+
+            let pos = [r, c];
+
+            if (data.agent[0] === r && data.agent[1] === c) {
+                div.innerHTML = "A";
+                div.style.background = "lightblue";
+            } else if (data.pits.some(p => p[0]===r && p[1]===c)) {
+                div.style.background = "red";
+            } else if (data.wumpus[0] === r && data.wumpus[1] === c) {
+                div.style.background = "darkred";
+            } else if (data.gold[0] === r && data.gold[1] === c) {
+                div.style.background = "gold";
+            } else if (data.visited.some(v => v[0]===r && v[1]===c)) {
+                div.style.background = "lightgreen";
+            } else {
+                div.style.background = "gray";
+            }
+
+            grid.appendChild(div);
+        }
+    }
+
+    document.getElementById("info").innerHTML =
+        "Percepts: " + data.percepts +
+        "<br>Score: " + data.score +
+        "<br>Inference Steps: " + data.inference_steps;
+}
+
+function loop() {
+    fetch("/state")
+        .then(res => res.json())
+        .then(data => draw(data));
+}
+
+setInterval(loop, 1000);
+</script>
+
+</body>
+</html>
